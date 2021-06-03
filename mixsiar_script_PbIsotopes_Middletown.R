@@ -18,7 +18,7 @@ mix <- load_mix_data(filename=mix.filename,
                      cont_effects=NULL)
 
 # Load source data
-# Used standard deviations from Hamilton coal and background soil, then added those sample numbers to total n for each
+# Used standard deviations from Hamilton coal and background soil (LeGalley et al., 2013), then added those sample numbers to total n for each
 # Leaded gasoline values from Chow and Johnstone (1965), Rabinowitz and Wetherill (1972), Sherrell et al. (1992)
 # Fly ash from Wang et al. (2019)-Appalachian 
 source.filename <- system.file("extdata", "Middletown_sources.csv", package = "MixSIAR")
