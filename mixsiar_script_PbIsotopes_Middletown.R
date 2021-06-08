@@ -56,7 +56,10 @@ output_JAGS(jags.1, mix, source)
 
 #summary(jags.1)
 
-#Export your data to .csv file
-require(R2jags)
-attach.jags(jags.1)
-write.csv(p.global, file="Middletown_output_grouped model.csv")
+
+#Posterior summary stats after a posteriori groupings of the 5 initial pollution sources into 3 groups, glacial till, industrial combustion, and leaded gasoline
+#Take note of greater weighting of the industrial combustion prior because of combining sources
+combined <- combine_sources(jags.1, mix, source, alpha.prior=1, 
+                            groups=list(`Industrial Combustion`=c("Coal","Fly Ash", "Steel Plant"), `Glacial Till`=c("Glacial Till"),`Leaded Gasoline`=c("Leaded Gasoline")))
+
+summary_stat(combined)
