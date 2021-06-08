@@ -4,12 +4,12 @@
 
 ################################################################################
 # Pb isotope source provenance script (3 isotope ratios, no random effects)
-# For samples from Middletown, Ohio
+# For PM and lichen sample comparison from Middletown, Ohio
 
 library(MixSIAR)
 
 # Load mix data
-mix.filename <- system.file("extdata", "Middletown_mixtures.csv", package = "MixSIAR")
+mix.filename <- system.file("extdata", "Middletown_mixtures_PM.csv", package = "MixSIAR")
 mix <- load_mix_data(filename=mix.filename,
                      iso_names=c("Pb206Pb204","Pb207Pb204","Pb208Pb204"),
                      factors=c("Sample"),
@@ -21,7 +21,7 @@ mix <- load_mix_data(filename=mix.filename,
 # Used standard deviations from Hamilton coal and background soil, then added those sample numbers to total n for each
 # Leaded gasoline values from Chow and Johnstone (1965), Rabinowitz and Wetherill (1972), Sherrell et al. (1992)
 # Fly ash from Wang et al. (2019)-Appalachian 
-source.filename <- system.file("extdata", "Middletown_sources.csv", package = "MixSIAR")
+source.filename <- system.file("extdata", "Middletown_sources_PM.csv", package = "MixSIAR")
 source <- load_source_data(filename=source.filename,
                            source_factors=NULL,
                            conc_dep=FALSE,
@@ -30,7 +30,7 @@ source <- load_source_data(filename=source.filename,
 
 # Load discrimination/TDF data
 # Not necessary for Pb data so set all values of mean and sd to 0
-discr.filename <- system.file("extdata", "Middletown_discrimination.csv", package = "MixSIAR")
+discr.filename <- system.file("extdata", "Middletown_discrimination_PM.csv", package = "MixSIAR")
 discr <- load_discr_data(filename=discr.filename, mix)
 
 # Make isospace plot
@@ -49,14 +49,17 @@ process_err <- TRUE
 write_JAGS_model(model_filename, resid_err, process_err, mix, source)
 
 # Run the JAGS model ("test" first, then "normal")
-jags.1 <- run_model(run="very long", mix, source, discr, model_filename,alpha.prior=1)
+jags.1 <- run_model(run="long", mix, source, discr, model_filename,alpha.prior=1)
 
 # Process diagnostics, summary stats, and posterior plots
 output_JAGS(jags.1, mix, source)
 
 #summary(jags.1)
 
-#Export your data to .csv file
-require(R2jags)
-attach.jags(jags.1)
-write.csv(p.global, file="Middletown_output_grouped model.csv")
+
+#Posterior summary stats after a posteriori groupings of the 4 initial pollution sources into 3 groups, glacial till, industrial combustion, and leaded gasoline
+#Take note of greater weighting of the industrial combustion prior because of combining sources
+combined <- combine_sources(jags.1, mix, source, alpha.prior=1, 
+                            groups=list(`Industrial Combustion`=c("Coal","Fly Ash"), `Glacial Till`=c("Glacial Till"),`Leaded Gasoline`=c("Leaded Gasoline")))
+
+summary_stat(combined)
