@@ -40,7 +40,7 @@ plot_data(filename="isospace_plot",
           mix,source,discr)
 
 # Plot your prior
-#plot_prior(alpha.prior=1,source)
+#plot_prior(alpha.prior=1,source) #uninformative/generalist prior
 
 # Define model structure and write JAGS model file
 model_filename <- "MixSIAR_model.txt"
@@ -48,7 +48,7 @@ resid_err <- FALSE
 process_err <- TRUE
 write_JAGS_model(model_filename, resid_err, process_err, mix, source)
 
-# Run the JAGS model ("test" first, then "normal")
+# Run the JAGS model ("test" first, then "normal"), uninformative/generalist prior
 jags.1 <- run_model(run="long", mix, source, discr, model_filename,alpha.prior=1)
 
 # Process diagnostics, summary stats, and posterior plots
